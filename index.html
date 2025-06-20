@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR GAME 2</title>
+
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bitter&display=swap" rel="stylesheet" />
+  <link href="https://fonts.cdnfonts.com/css/tropika-island" rel="stylesheet" />
+
+  <style>
+#startButtonContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh; /* altura del 80% de la pantalla */
+}
+
+#startButton {
+  font-size: 2rem;
+  padding: 1rem 2rem;
+  background-color: #f9d923;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+    #timer {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  background: rgba(0,0,0,0.7);
+  padding: 0.5em 1em;
+  color: #f9d923;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  z-index: 10000;
+}
+
+#lostMessage {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 2rem;
+  border-radius: 10px;
+  color: red;
+  font-size: 2rem;
+  z-index: 1000;
+  text-align: center;
+}
+
+#lostMessage button {
+  margin-top: 1rem;
+  background: #f9d923;
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .background-wrapper {
+      position: relative;
+      min-height: 100vh;
+      background: url('fondo.jpg') no-repeat center center fixed;
+      background-size: cover;
+      padding: 2rem;
+      text-align: center;
+      color: #f0f0f0;
+      z-index: 1;
+    }
+
+    .background-wrapper::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.55); /* Oscurecimiento */
+      z-index: -1;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4rem;
+      color: #fff;
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: black;
+      display: inline-block;
+      padding: 0.2em 0.5em;
+      border-radius: 0.3em;
+      overflow: hidden;
+      text-shadow: 0 0 5px #f9d923, 0 0 10px #f9d923, 0 0 20px #f9d923, 0 0 40px #f9d923;
+      margin-bottom: 1rem;
+    }
+
+    h1::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -75%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(120deg, rgba(249,217,35,0) 0%, rgba(249,217,35,0.6) 50%, rgba(249,217,35,0) 100%);
+      transform: skewX(-25deg);
+      animation: shine 3s infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes shine {
+      0% { left: -75%; }
+      100% { left: 125%; }
+    }
+
+    .section {
+      display: none;
+      margin-top: 2rem;
+    }
+
+    input {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-left: 0.5rem;
+      background-color: #f9d923;
+      color: #111;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ffcd38;
+    }
+
+    .success {
+      display: none;
+      color: #0f0;
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      background: #003300;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #0f0;
+    }
+
+    #miVideo {
+      margin: 1rem auto;
+      display: block;
+      max-width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+
+    #video-controls {
+      margin-top: 10px;
+    }
+
+    #video-controls button {
+      margin: 0 5px;
+    }
+
+    .clue-img {
+      margin: 1rem auto;
+      display: block;
+      width: 250px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+
+    .error-msg {
+      display: none;
+      background-color: #330000;
+      color: #ff5555;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff0000;
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      animation: fadeInOut 2.5s ease-in-out;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: scale(0.95); }
+      10% { opacity: 1; transform: scale(1); }
+      90% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.95); }
+    }
+
+    @keyframes inputFlash {
+      0% { background-color: #330000; }
+      50% { background-color: #ff4444; }
+      100% { background-color: #330000; }
+    }
+
+    .input-error {
+      animation: inputFlash 0.5s;
+    }
+
+  .start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #aeed6b; /* verde lima pastel */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .start-screen::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+    animation: moveLights 6s linear infinite;
+    transform: rotate(25deg);
+  }
+
+  @keyframes moveLights {
+    0% { transform: translateX(-50%) rotate(25deg); }
+    100% { transform: translateX(50%) rotate(25deg); }
+  }
+
+  #startButton {
+    font-size: 2rem;
+    padding: 1rem 2rem;
+    background-color: #f9d923;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 1;
+  }
+  </style>
+</head>
+
+<body>
+  <button id="homeButton" onclick="window.location.href='https://www.alaskaescaperooms.com/'" style="
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 10000;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #f9d923;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+">
+  Offical Website
+</button>
+
+  <button id="home2Button" onclick="window.location.href='https://www.facebook.com/Alaskaescaperooms'" style="
+  position: fixed;
+  top: 50px; /* un poco más abajo que el primero */
+  left: 10px;
+  z-index: 10000;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #f9d923;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+">
+  Facebook
+</button>
+  
+    <button id="home3Button" onclick="window.location.href='https://www.instagram.com/alaskaescaperooms/'" style="
+  position: fixed;
+  top: 90px; /* un poco más abajo que el primero */
+  left: 10px;
+  z-index: 10000;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #f9d923;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+">
+  Instagram
+</button>
+  
+  <div id="startScreen" class="start-screen">
+  <button id="startButton" onclick="startGame()">PLAY</button>
+</div>
+
+  <audio id="backgroundMusic" loop hidden>
+  <source src="musica.mp3" type="audio/mpeg">
+  Tu navegador no soporta audio.
+</audio>
+
+<div id="timer">Time: <span id="time">60</span>s</div>
+<div id="lostMessage">
+  YOU LOST<br/>
+  <button onclick="hideLostMessage()">Continue Playing</button>
+</div>
+
+  <div id="gameContent" style="display:none;">
+  <div class="background-wrapper">
+    
+    <h1>QR GAME</h1>
+    <p>You found a mysterious book. A riddle is written inside:</p>
+
+    <video id="miVideo" width="300" height="200" controls>
+      <source src="Libro.mp4" type="video/mp4" />
+      Tu navegador no soporta el video.
+    </video>
+    <div id="video-controls">
+      <button id="playBtn">Play</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="resetBtn">Replay</button>
+    </div>
+
+    <p><em>"It sees all, but has no eyes. It doesn't exist, yet guides your path."</em></p>
+
+    <div>
+      <input type="text" id="input1" placeholder="Enter answer" />
+      <button onclick="checkAnswer('input1','Mirror','section1')">Submit</button>
+    </div>
+
+     <div id="section1" class="section">
+      <h2>Clue 2 unlocked</h2>
+      <img src="thunder.jpg" alt="Mysterious Bottle" class="clue-img" />
+      <p><strong>"It's not visible, but it resounds,it comes after the flash. The sky roars with its voice, and everyone looks to the ground."</strong></p>
+      <input type="text" id="input3" placeholder="Enter answer" />
+      <button onclick="checkAnswer('input3','Thunder','section2')">Submit</button>
+    </div>
+
+    <div id="section2" class="section">
+      <h2>Clue 2 unlocked</h2>
+      <img src="pony.jpg" alt="Mysterious Bottle" class="clue-img" />
+      <p><strong>"I'm small but strong, sometimes tender, sometimes spirited. I'm not a complete horse, but I have its powerful spirit."</strong></p>
+      <input type="text" id="input3" placeholder="Enter answer" />
+      <button onclick="checkAnswer('input3','Pony','section3')">Submit</button>
+    </div>
+
+    <div id="section3" class="section">
+      <h2>Clue 3 unlocked</h2>
+      <p>You've reached the final lock. Enter the final code:</p>
+      <input type="text" id="input4" placeholder="Enter code" />
+      <button onclick="checkAnswer('input4','2026','finalMsg')">Unlock</button>
+      <div id="finalMsg" class="success">
+
+        🎉 <strong>Well done!</strong><br>
+        You’ve conquered the riddles and unlocked the final secret of the QR GAME!<br>
+        Prepare for your next adventure...
+
+        <img src="felicitaciones.gif" alt="Felicidades" style="margin-top: 1rem; max-width: 300px; border-radius: 10px; box-shadow: 0 0 10px rgba(255,255,255,0.2);" />
+      </div>
+    </div>
+
+<div id="finalButtonContainer" style="margin-top: 1.5rem; display: none; text-align: center;">
+  <button onclick="window.location.href='https://www.youtube.com/watch?v=hryVXjkxs8w'" style="
+    padding: 0.8rem 1.5rem;
+    font-size: 1.2rem;
+    background-color: #f9d923;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #f9d923;
+  ">
+    NEW GAME
+  </button>
+</div>
+
+    <!-- Sonidos -->
+    <audio id="correctSound" src="UnlockSound.mp3" preload="auto"></audio>
+    <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
+
+    <!-- Mensaje de error -->
+    <div id="errorMsg" class="error-msg">❌ Incorrect. Try again!</div>
+  </div>
+
+  <script>
+    function checkAnswer(inputId, correctAnswer, showId) {
+      const val = document.getElementById(inputId).value.trim().toLowerCase();
+      const correctSound = document.getElementById('correctSound');
+      const incorrectSound = document.getElementById('incorrectSound');
+      const errorMsg = document.getElementById('errorMsg');
+      const inputElem = document.getElementById(inputId);
+
+      const errorMessages = [
+        "❌ Incorrect. Try again!",
+        "😕 Nope. Not quite.",
+        "🚫 That's not it!",
+        "🙈 Try another guess!",
+        "😬 Not correct. Keep going!"
+      ];
+
+      if (val === correctAnswer.toLowerCase()) {
+        document.getElementById(showId).style.display = 'block';
+        correctSound.currentTime = 0;
+        correctSound.play();
+      if (showId === 'finalMsg') {
+  stopTimer();
+  document.getElementById('backgroundMusic').pause(); // Pausa la música al ganar
+  document.getElementById('finalButtonContainer').style.display = 'block';
+
+}
+      } else {
+        incorrectSound.currentTime = 0;
+        incorrectSound.play();
+
+        const randomMsg = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+        errorMsg.textContent = randomMsg;
+        errorMsg.style.display = 'block';
+        errorMsg.style.animation = 'fadeInOut 2.5s ease-in-out';
+
+        inputElem.classList.add('input-error');
+        setTimeout(() => {
+          inputElem.classList.remove('input-error');
+          errorMsg.style.display = 'none';
+        }, 2500);
+      }
+    }
+
+    // Controles de video
+    const video = document.getElementById('miVideo');
+    document.getElementById('playBtn').addEventListener('click', () => video.play());
+    document.getElementById('pauseBtn').addEventListener('click', () => video.pause());
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      video.pause();
+      video.currentTime = 0;
+    });
+  </script>
+  <script>
+  let timeLeft = 60;
+  let timerStopped = false;
+  let timerInterval;
+
+  function hideLostMessage() {
+    document.getElementById('lostMessage').style.display = 'none';
+  }
+
+  function stopTimer() {
+    timerStopped = true;
+  }
+</script>
+
+  </div> <!-- cierre de background-wrapper -->
+</div> <!-- cierre de gameContent -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const music = document.getElementById('backgroundMusic');
+    music.pause();         // detiene el audio si llega a reproducirse
+    music.currentTime = 0; // lo reinicia
+  });
+function startGame() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('gameContent').style.display = 'block';
+  startTimer();
+  
+  const music = document.getElementById('backgroundMusic');
+  music.volume = 0.001; // volumen suave
+  music.play();
+}
+
+
+  function startTimer() {
+    timerStopped = false;
+    timerInterval = setInterval(() => {
+      if (!timerStopped) {
+        document.getElementById('time').textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('lostMessage').style.display = 'block';
+          document.getElementById('backgroundMusic').pause(); // Pausa la música al perder
+        }
+        timeLeft--;
+      }
+    }, 1000);
+  }
+</script>
+
+<script>
+  const backgroundMusic = document.getElementById('backgroundMusic');
+
+  function muteBackgroundMusic() {
+    backgroundMusic.volume = 0;
+  }
+
+  function unmuteBackgroundMusic() {
+    backgroundMusic.volume = 0.1; // ajusta el volumen que quieras restaurar
+  }
+
+  // Selecciona todos los videos y audios excepto el de fondo
+  const mediaElements = document.querySelectorAll('audio:not(#backgroundMusic), video');
+
+  mediaElements.forEach(media => {
+    media.addEventListener('play', () => {
+      muteBackgroundMusic();
+    });
+
+    media.addEventListener('pause', () => {
+      // solo reactiva si ningún otro está reproduciéndose
+      const anyPlaying = Array.from(mediaElements).some(m => !m.paused && !m.ended);
+      if (!anyPlaying) unmuteBackgroundMusic();
+    });
+
+    media.addEventListener('ended', () => {
+      const anyPlaying = Array.from(mediaElements).some(m => !m.paused && !m.ended);
+      if (!anyPlaying) unmuteBackgroundMusic();
+    });
+  });
+</script>
+
+
+</body>
+</html>
